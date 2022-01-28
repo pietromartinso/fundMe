@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Funding | ESMAFE/PR </title>
+
+    <!-- Bootstrap -->
+    <link href="vendor/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="vendor/bootstrap/dist/js/bootstrap.min.js"></script>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- had to add this script since truffle depends on it -->
+    <script src="vendor/web3/dist/web3.min.js"></script>
+    <script src="app.js"></script>
+      
+    <link rel="stylesheet" href="https://unpkg.com/tailwindcss@1.9.6/dist/tailwind.min.css">
+
+    <style>
+      main {
+        margin-top: 60px;
+      }
+
+      #content {
+        display: none;
+      }
+
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
+      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="https://www.esmafe.com/cursos/direito-dos-criptoativos-e-blockchain/" target="_blank">ESMAFE/PR | Funding Contract</a>
+      <ul class="navbar-nav px-3">
+        <li class="nav-item text-nowrap d-none d-sm-none d-sm-block">
+          <small><a class="nav-link" href="#"><span id="account" onclick="App.userAccountClicked()"></span></a></small>
+        </li>
+      </ul>
+    </nav>
+    <div class="container-fluid">
+      <div class="row">
+        <main role="main" class="col-lg-12 d-flex justify-content-center">
+          <!-- Only a "Loading..." message  -->
+          <div id="loader" class="text-center">
+            <p class="text-center">Loading...</p>
+          </div>
+           <!-- Real content to be displayed after login  -->
+          <div id="content">
+            <!-- User account & Smart Contract Info's -->
+            <div class="rounded bg-green-100 flex flex-col justify-center content-center items-center py-4 px-4">
+              <!-- ETH price in USD (LinkChain powered) -->
+              <div class="flex-col space-y-2 items-center">
+                <p  class="text-gray-800 text-2xl">
+                  <span>ETH price is now: US$</span>
+                  <span id="ethPrice"></span>
+                </p>
+              </div>
+              <!-- Account's Balance -->
+              <div class="flex-col py-2 items-center">
+                <p  class="text-gray-800 text-l">
+                  <span>Your account balance is:</span>
+                  <span id="ethBalance"></span>
+                  <span>ETH - (US$</span>
+                  <span id="usdBalance"></span>
+                  <span>)</span>
+                </p>
+              </div>
+
+              <!-- Fund in ETH Button -->
+              <div class="flex justify-center content-center items-center py-1">
+                <label id="inputEthValueLabel" for="inputEthValue" class="px-2">
+                  Value to fund (in ETH):
+                </label>
+                <input type="number" id="inputEthValue" class="rounded bg-green-200 py-2 px-2 ">
+                <button id="fundButton" onclick="App.fundContractInEth()" class="rounded bg-green-500 hover:bg-green-700 py-2 px-2 text-white">
+                  Fund!
+                </button>
+              </div>
+
+              <!-- Fund in USD Button -->
+              <div class="flex justify-center content-center items-center py-1">
+                <label id="inputUsdValueLabel" for="inputUsdValue" class="px-2">
+                  Value to fund (in USD):
+                </label>
+                <input type="number" id="inputUsdValue" class="rounded bg-blue-200 py-2 px-2">
+                <button id="fundButton" onclick="App.fundContractInUsd()" class="rounded bg-blue-500 hover:bg-blue-700 py-2 px-2 text-white">
+                  Fund!
+                </button>
+              </div>
+            </div>
+
+            
+            <!-- Owners infos -->
+            <div id="owner" class="rounded bg-purple-100 flex flex-col justify-center content-center items-center py-2 px-4" style="margin-top: 5px; display: none">
+              <!-- Contracts's Balance -->
+              <div class="flex-col py-2 items-center">
+                <p  class="text-gray-800 text-l">
+                  <span>Your contract balance is:</span>
+                  <span id="ethContractBalance"></span>
+                  <span>ETH - (US$</span>
+                  <span id="usdContractBalance"></span>
+                  <span>)</span>
+                </p>
+              </div>
+
+              <!-- Get amount funded by address -->
+              <div class="rounded bg-purple-200 flex flex-col w-full h-full justify-center content-center items-center py-1">
+                <div class="w-full py-1 items-center">
+                  <label id="inputAmountByAddressLabel" for="inputAmountByAddress" class="px-2">
+                    Input Address:
+                  </label>
+                  <input type="text" id="inputAmountByAddress" class="rounded py-2 px-2">
+                  <button id="fundButton" onclick="App.getFundedBalance()" class="rounded bg-gray-400 hover:bg-gray-700 py-2 px-2 text-white">
+                    Consult
+                  </button>
+                </div>
+                  <p id="amountFundedText" class="text-gray-800 text-l" style="margin-top: 5px; display: none">
+                    <span>This address has funded:</span>
+                    <span id="ethFundAmount"></span>
+                    <span>ETH - (US$</span>
+                    <span id="usdFundAmount"></span>
+                    <span>)</span>
+                  </p>
+              </div>
+  
+              <!-- Withdraw Button -->
+              <div class="flex w-full h-full justify-center content-center items-center py-1">
+                <button id="withdrawFundsButton" onclick="App.withdrawFunds()" class="rounded w-full h-full bg-purple-500 hover:bg-purple-700 py-2 px-4 text-white">
+                  Withdraw All Funds
+                </button>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

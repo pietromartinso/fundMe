@@ -1,0 +1,22 @@
+{
+  "name": "funding-contract",
+  "version": "0.0.1",
+  "description": "Blockchain Funding Contract Powered By Ethereum",
+  "main": "truffle-config.js",
+  "directories": {
+  },
+  "scripts": {
+    "dev": "lite-server",
+    "test": "echo \"Error: no test specified\" && sexit 1"
+  },
+  "author": "profpietromartins@gmail.com",
+  "license": "ISC",
+  "devDependencies": {
+    "bootstrap": "4.1.3",
+    "lite-server": "^2.3.0",
+    "nodemon": "^1.17.3"
+  },
+  "dependencies": {
+    "web3": "^1.7.0"
+  }
+}
