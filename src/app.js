@@ -126,6 +126,7 @@ App = {
     await App.loadWeb3()
     await App.loadAccount()
     await App.loadContract()
+    
     await App.render()
   },
 
@@ -138,7 +139,6 @@ App = {
       } else {
         alert('MetaMask found but no Web3 found.');
       }
-      console.log('MetaMask is ok!')
     } else {
       console.log('Non-Ethereum browser detected. You should consider trying MetaMask!')
     }
@@ -177,10 +177,8 @@ App = {
     try{
       const response = await App.fundMe.methods.owner().call({from: window.userAddress})
       if(response == App.account){
-        console.log("Is Owner: ", response)
         return true
       } else {
-        console.log("Isn't Owner: ", response)
         return false
       }
     } catch (err) {
