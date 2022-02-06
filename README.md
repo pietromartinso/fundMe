@@ -4,6 +4,12 @@ This little project was built in order to practice Solidity's smart contracts
 usage of oracles by codification, build, deployment and interaction/execution,
 via Remix & web3.js.
 
+Run:
+
+- `npm install`
+
+- `npm run dev`
+
 ## FundMe.sol
 
 This smart contract was written at Remix IDE and deployed to Rinkeby testnet:
@@ -34,7 +40,7 @@ owner account, like the consult of amount of ETH donated per account.
 
 1 - Must have MetaMask installed (doesn't need truffle, ganache, etc);
 2 - Used web3.js version 1.7.0 (some methods are different from versions > 1.x.x)
-3 - Bootstrap, Tailwind and jQuery are being used as well.
+3 - jQuery, Bootstrap and Tailwind are being used as well.
 
 ---
 

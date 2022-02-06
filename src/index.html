@@ -6,25 +6,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <title>Funding | ESMAFE/PR </title>
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <!-- Bootstrap -->
     <link href="vendor/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="vendor/bootstrap/dist/js/bootstrap.min.js"></script>
     <!-- had to add this script since truffle depends on it -->
     <script src="vendor/web3/dist/web3.min.js"></script>
     <script src="app.js"></script>
+    <!-- TailWind  CSS -->
     <link rel="stylesheet" href="https://unpkg.com/tailwindcss@1.9.6/dist/tailwind.min.css">
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Righteous&display=swap" rel="stylesheet">
 
     <style>
       main {
         margin-top: 60px;
       }
 
-      #content {
-        display: none;
+      .placeholder-item {
+          box-shadow: 0 4px 10px 0 rgba(33, 33, 33, 0.15);
+          border-radius: 4px;
+          height: 200px;
+          position: relative;
+          overflow: hidden;
       }
+
+      .placeholder-item::before {
+          content: '';
+          display: block;
+          position: absolute;
+          left: -150px;
+          top: 0;
+          height: 100%;
+          width: 150px;
+          background: linear-gradient(to right, transparent 0%, #E8E8E8 50%, transparent 100%);
+          animation: load 1s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+      }
+
+      @keyframes load {
+      from {
+          left: -150px;
+      }
+      to   {
+          left: 100%;
+      }
+}
+
+
     </style>
   </head>
   <body>
@@ -44,7 +74,7 @@
             <p class="text-center">Loading...</p>
           </div>
            <!-- Real content to be displayed after login  -->
-          <div id="content">
+          <div id="content" class="hidden">
             <!-- User account & Smart Contract Info's -->
             <div class="rounded bg-green-100 flex flex-col justify-center content-center items-center py-4 px-4">
               <!-- ETH price in USD (LinkChain powered) -->
@@ -65,24 +95,32 @@
                 </p>
               </div>
 
+              <div id="fundEthPending" class="hidden placeholder-item flex w-full h-auto justify-center content-center items-center py-2 m-1">
+                Pending...
+              </div>
+
               <!-- Fund in ETH Button -->
-              <div class="flex justify-center content-center items-center py-1">
+              <div id="fundEthContent" class="flex justify-center content-center items-center py-1">
                 <label id="inputEthValueLabel" for="inputEthValue" class="px-2">
                   Value to fund (in ETH):
                 </label>
-                <input type="number" id="inputEthValue" class="rounded bg-green-200 py-2 px-2 ">
-                <button id="fundButton" onclick="App.fundContractInEth()" class="rounded bg-green-500 hover:bg-green-700 py-2 px-2 text-white">
+                <input type="number" id="inputEthValue" class="rounded bg-green-200 py-2 px-2">
+                <button id="fundEthButton" onclick="App.fundContractInEth()" class="rounded bg-green-500 hover:bg-green-700 py-2 px-2 text-white">
                   Fund!
                 </button>
               </div>
 
+              <div id="fundUsdPending" class="hidden placeholder-item flex w-full h-auto justify-center content-center items-center py-2 m-1">
+                Pending...
+              </div>
+              
               <!-- Fund in USD Button -->
-              <div class="flex justify-center content-center items-center py-1">
+              <div id="fundUsdContent" class=" flex justify-center content-center items-center py-1">
                 <label id="inputUsdValueLabel" for="inputUsdValue" class="px-2">
                   Value to fund (in USD):
                 </label>
                 <input type="number" id="inputUsdValue" class="rounded bg-blue-200 py-2 px-2">
-                <button id="fundButton" onclick="App.fundContractInUsd()" class="rounded bg-blue-500 hover:bg-blue-700 py-2 px-2 text-white">
+                <button id="fundUsdButton" onclick="App.fundContractInUsd()" class="rounded bg-blue-500 hover:bg-blue-700 py-2 px-2 text-white">
                   Fund!
                 </button>
               </div>
@@ -90,7 +128,7 @@
 
             
             <!-- Owners infos -->
-            <div id="owner" class="rounded bg-purple-100 flex flex-col justify-center content-center items-center py-2 px-4" style="margin-top: 1px; display: none">
+            <div id="owner" class="hidden rounded bg-purple-100 flex flex-col justify-center content-center items-center py-2 px-4" style="margin-top: 1px;">
               <!-- Contracts's Balance -->
               <div class="flex-col py-2 items-center">
                 <p  class="text-gray-800 text-l">
@@ -103,27 +141,46 @@
               </div>
 
               <!-- Get amount funded by address -->
-              <div class="rounded bg-purple-200 flex flex-col w-full h-full justify-center content-center items-center py-1">
-                <div class="w-full py-1 items-center">
-                  <label id="inputAmountByAddressLabel" for="inputAmountByAddress" class="px-2">
+              <div class="rounded bg-purple-200 flex flex-col w-full h-full justify-center content-center items-center py-1 px-2">
+                
+                <div id="consultPending" class="hidden placeholder-item flex w-full h-auto justify-center content-center items-center py-2 m-1">
+                  Pending...
+                </div>
+                
+                <div id="consultAddressContent" class="w-full flex py-1 justify-between">
+                  <label id="inputAmountByAddressLabel" for="inputAmountByAddress" class="pt-2 px-1 align-middle text-sm">
                     Input Address:
                   </label>
                   <input type="text" id="inputAmountByAddress" class="rounded py-2 px-2">
-                  <button id="fundButton" onclick="App.getFundedBalance()" class="rounded bg-gray-400 hover:bg-gray-700 py-2 px-2 text-white">
+                  <button id="consultButton" onclick="App.getFundedBalance()" class="rounded bg-gray-400 hover:bg-gray-700 py-2 px-2 text-white">
                     Consult
                   </button>
                 </div>
-                  <p id="amountFundedText" class="text-gray-800 text-l" style="margin-top: 5px; display: none">
+
+                
+                <div id="amountFundedText" class="hidden rounded flex justify-center content-center items-center" style="margin-top: 5px; border: 1px solid black;">
+                  <p class="text-gray-800 text-sm">
                     <span>This address has funded:</span>
                     <span id="ethFundAmount"></span>
                     <span>ETH - (US$</span>
                     <span id="usdFundAmount"></span>
                     <span>)</span>
                   </p>
+                  <a href="#" onclick="App.handleDeleteFundedBalance()" class="flex justify-center content-center items-center" >
+                    <span class="material-icons icons-list material-icons-outlined text-sm"  style="font-size: 21px;">
+                      delete
+                    </span>
+                  </a>
+                </div>
+
               </div>
-  
+              
+              <div id="withdrawPending" class="hidden placeholder-item flex w-full h-auto justify-center content-center items-center py-2 m-1">
+                Pending...
+              </div>
+
               <!-- Withdraw Button -->
-              <div class="flex w-full h-full justify-center content-center items-center py-1">
+              <div id="withdrawContent" class=" flex w-full h-full justify-center content-center items-center py-1">
                 <button id="withdrawFundsButton" onclick="App.withdrawFunds()" class="rounded w-full h-full bg-purple-500 hover:bg-purple-700 py-2 px-4 text-white">
                   Withdraw All Funds
                 </button>
