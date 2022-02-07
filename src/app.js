@@ -118,10 +118,6 @@ App = {
     }
   ],
   loading: false,
-  ethFundLoading: false,
-  usdFundLoading: false,
-  consultAddressLoading: false,
-  withdrawLoading: false,
   isOwner: false,
   contracts: {},
   fundMe: null,
@@ -153,9 +149,6 @@ App = {
     }
   },
 
-  handleAccountsChanged: () => {
-    window.location.reload()
-  },
 
   loadAccount: async () => {
 
@@ -202,52 +195,9 @@ App = {
 
   getAccountBalance: async () => {
     try{
-      const response = await window.web3.eth.getBalance(App.account) 
-      let _price = await App.getEtherPrice()
-      let ethText = App.formatWeiToFloat(response, 5)
-      document.getElementById("ethBalance").innerText = ethText
-      let usdText = parseFloat(_price) * parseFloat(ethText)
-      document.getElementById("usdBalance").innerText = App.formatFloat(usdText,2).toString()
-      return (ethText, usdText)
+      const response = await window.web3.eth.getBalance(App.account)
+      return response
     } catch (err) {
-      console.log(err)
-    }
-  },
-
-  fundContractInEth: async () => {
-    try{
-      let _val = document.getElementById("inputEthValue").value
-      if(_val){
-        App.setFundEthLoading(true)
-        _val = App.formatFloatToWei(_val)
-        await App.fundMe.methods.fund().send({from: App.account, value: _val})
-        App.setFundEthLoading(false) 
-        window.location.reload()
-      } else {
-        alert("You are trying to fund empty value. Please, set the ETH amount to deposit.")
-        return
-      }
-    } catch (err){
-      console.log(err)
-    }
-  },
-
-  fundContractInUsd: async () => {
-    try{
-      let _val = document.getElementById("inputUsdValue").value
-      if(_val){
-        App.setFundUsdLoading(true)
-        let _usd = await App.getEtherPrice()
-        _val = parseFloat(_val) / parseFloat(_usd)
-        _val = App.formatFloatToWei(_val)
-        await App.fundMe.methods.fund().send({from: App.account, value: _val})
-        App.setFundUsdLoading(false)
-        window.location.reload()
-      } else {
-        alert("You are trying to fund empty value. Please, set the ETH amount to deposit.")
-        return
-      }
-    } catch (err){
       console.log(err)
     }
   },
@@ -267,9 +217,53 @@ App = {
       console.log(err)
     }
   },
+  
+  handleAccountsChanged: () => {
+    window.location.reload()
+  },
 
-  getFundedBalance: async () => {
-    App.setConsultLoading(true)
+  handleClickEth: async () => {
+    try{
+      let _val = document.getElementById("inputEthValue").value
+      if(_val){
+        App.renderFundEthLoading(true)
+        _val = App.formatFloatToWei(_val)
+        await App.fundMe.methods.fund().send({from: App.account, value: _val})
+        App.renderFundEthLoading(false) 
+        window.location.reload()
+      } else {
+        alert("You are trying to fund empty value. Please, set the ETH amount to deposit.")
+        return
+      }
+    } catch (err){
+      window.location.reload()
+      console.log(err)
+    }
+  },
+
+  handleClickUsd: async () => {
+    try{
+      let _val = document.getElementById("inputUsdValue").value
+      if(_val){
+        App.renderFundUsdLoading(true)
+        let _usd = await App.getEtherPrice()
+        _val = parseFloat(_val) / parseFloat(_usd)
+        _val = App.formatFloatToWei(_val)
+        await App.fundMe.methods.fund().send({from: App.account, value: _val})
+        App.renderFundUsdLoading(false)
+        window.location.reload()
+      } else {
+        alert("You are trying to fund empty value. Please, set the ETH amount to deposit.")
+        return
+      }
+    } catch (err){
+      window.location.reload()
+      console.log(err)
+    }
+  },
+
+  handleClickFind: async () => {
+    App.renderConsultLoading(true)
     try{
       let address = document.getElementById("inputAmountByAddress").value
       
@@ -289,14 +283,14 @@ App = {
         
         document.getElementById("amountFundedText").classList.remove("hidden")
         
-        App.setConsultLoading(false)
+        App.renderConsultLoading(false)
         return (ethText, usdText)
       } else {
-        App.setConsultLoading(false)
+        App.renderConsultLoading(false)
         alert("Please, insert a proper Ethereum Address.")
       }
     } catch (err) {
-      App.setConsultLoading(false)
+      App.renderConsultLoading(false)
       alert("Please, insert a proper Ethereum Address.")
       console.log(err)
     }
@@ -307,49 +301,57 @@ App = {
     document.getElementById("inputAmountByAddress").value = ""
   },
 
-  //withdrawFundsButton
-  withdrawFunds: async () => {
+  handleClickWithdraw: async () => {
     try{
-      App.setWithdrawLoading(true)
+      App.renderWithdrawLoading(true)
       await App.fundMe.methods.withdraw().send({from: App.account})
-      App.setWithdrawLoading(false)
+      App.renderWithdrawLoading(false)
       window.location.reload()
     } catch (err){
       alert("Could not withdraw funds.")
-      App.setWithdrawLoading(false)
+      window.location.reload()
       console.log(err)
     }
   },
 
+  handleAccountClicked: () => {
+    var data = document.getElementById("account").innerText
+    
+    navigator.clipboard.writeText(data)
+  },
+
   render: async () => {
-    //Prevent double render
-    if(App.loading){
-      return
-    }
 
     //Update app loading state
-    App.setLoading(true)
+    App.renderLoading(true)
 
     //Render account into the "header" of the web page (span tag from the html)
     document.getElementById("account").innerText = App.account
 
-    await App.getAccountBalance()
-    await App.renderContract()
+    await App.renderUserBalance()
 
     //Update app loading state
-    App.setLoading(false)
+    App.renderLoading(false)
 
-    App.renderOwner()
+    await App.renderOwnerArea()
 
   },
-
-  renderContract: async () => {
-    await App.getContractBalance()
+  
+  renderUserBalance: async () => {
+    try{
+      const response = await App.getAccountBalance() 
+      let _price = await App.getEtherPrice()
+      let ethText = App.formatWeiToFloat(response, 5)
+      document.getElementById("ethBalance").innerText = ethText
+      let usdText = parseFloat(_price) * parseFloat(ethText)
+      document.getElementById("usdBalance").innerText = App.formatFloat(usdText,2).toString()
+      return (ethText, usdText)
+    } catch (err) {
+      console.log(err)
+    }
   },
 
-  setLoading: (boolean) => {
-    App.loading = boolean
-    
+  renderLoading: (boolean) => {
     const content = document.getElementById("content")
     const loader = document.getElementById("loader")
 
@@ -362,9 +364,7 @@ App = {
     }
   },
 
-  setConsultLoading: (boolean) => {
-    App.consultAddressLoading = boolean
-    
+  renderConsultLoading: (boolean) => {    
     const consultPending = document.getElementById("consultPending")
     const consultAddressContent = document.getElementById("consultAddressContent")
 
@@ -377,9 +377,7 @@ App = {
     }
   },
 
-  setFundEthLoading: (boolean) => {
-    App.ethFundLoading = boolean
-
+  renderFundEthLoading: (boolean) => {
     const fundEthPending = document.getElementById("fundEthPending")
     const fundEthContent = document.getElementById("fundEthContent")
 
@@ -392,9 +390,7 @@ App = {
     }
   },
   
-  setFundUsdLoading: (boolean) => {
-    App.usdFundLoading = boolean
-    
+  renderFundUsdLoading: (boolean) => {    
     const fundUsdPending = document.getElementById("fundUsdPending")
     const fundUsdContent = document.getElementById("fundUsdContent")
 
@@ -407,9 +403,7 @@ App = {
     }
   },
 
-  setWithdrawLoading: (boolean) => {
-    App.withdrawLoading = boolean
-    
+  renderWithdrawLoading: (boolean) => {
     const withdrawPending = document.getElementById("withdrawPending")
     const withdrawContent = document.getElementById("withdrawContent")
 
@@ -422,22 +416,20 @@ App = {
     }
   },
 
-  userAccountClicked: () => {
-    var data = document.getElementById("account").innerText
-    
-    navigator.clipboard.writeText(data)
-  },
-
-  renderOwner: () => {
+  renderOwnerArea: async () => {
     const owner = document.getElementById("owner")
-    if (App.isOwner) {
-      owner.classList.remove("hidden")
-    } else {
-      owner.classList.add("hidden")
+    try{
+
+      if (App.isOwner) {
+        await App.getContractBalance()
+        owner.classList.remove("hidden")
+      } else {
+        owner.classList.add("hidden")
+      }
+    } catch (err){
+      console.log(err)
     }
   },
-
-  
 
   formatWeiToFloat: (val, precision) => {
     let res = (parseInt(val) / (10 ** 18)).toString()

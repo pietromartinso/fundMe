@@ -62,7 +62,7 @@
       <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="https://www.esmafe.com/cursos/direito-dos-criptoativos-e-blockchain/" target="_blank">ESMAFE/PR | Funding Contract</a>
       <ul class="navbar-nav px-3">
         <li class="nav-item text-nowrap d-none d-sm-none d-sm-block">
-          <small><a class="nav-link" href="#"><span id="account" onclick="App.userAccountClicked()"></span></a></small>
+          <small><a class="nav-link" href="#"><span id="account" onclick="App.handleAccountClicked()"></span></a></small>
         </li>
       </ul>
     </nav>
@@ -105,7 +105,7 @@
                   Value to fund (in ETH):
                 </label>
                 <input type="number" id="inputEthValue" class="rounded bg-green-200 py-2 px-2">
-                <button id="fundEthButton" onclick="App.fundContractInEth()" class="rounded bg-green-500 hover:bg-green-700 py-2 px-2 text-white">
+                <button id="fundEthButton" onclick="App.handleClickEth()" class="rounded bg-green-500 hover:bg-green-700 py-2 px-2 text-white">
                   Fund!
                 </button>
               </div>
@@ -120,7 +120,7 @@
                   Value to fund (in USD):
                 </label>
                 <input type="number" id="inputUsdValue" class="rounded bg-blue-200 py-2 px-2">
-                <button id="fundUsdButton" onclick="App.fundContractInUsd()" class="rounded bg-blue-500 hover:bg-blue-700 py-2 px-2 text-white">
+                <button id="fundUsdButton" onclick="App.handleClickUsd()" class="rounded bg-blue-500 hover:bg-blue-700 py-2 px-2 text-white">
                   Fund!
                 </button>
               </div>
@@ -152,7 +152,7 @@
                     Input Address:
                   </label>
                   <input type="text" id="inputAmountByAddress" class="rounded py-2 px-2">
-                  <button id="consultButton" onclick="App.getFundedBalance()" class="rounded bg-gray-400 hover:bg-gray-700 py-2 px-2 text-white">
+                  <button id="consultButton" onclick="App.handleClickFind()" class="rounded bg-gray-400 hover:bg-gray-700 py-2 px-2 text-white">
                     Consult
                   </button>
                 </div>
@@ -181,7 +181,7 @@
 
               <!-- Withdraw Button -->
               <div id="withdrawContent" class=" flex w-full h-full justify-center content-center items-center py-1">
-                <button id="withdrawFundsButton" onclick="App.withdrawFunds()" class="rounded w-full h-full bg-purple-500 hover:bg-purple-700 py-2 px-4 text-white">
+                <button id="withdrawFundsButton" onclick="App.handleClickWithdraw()" class="rounded w-full h-full bg-purple-500 hover:bg-purple-700 py-2 px-4 text-white">
                   Withdraw All Funds
                 </button>
               </div>
