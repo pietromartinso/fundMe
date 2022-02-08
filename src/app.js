@@ -123,10 +123,10 @@ App = {
   fundMe: null,
 
   load: async () => {
-    await App.loadWeb3()
-    await App.loadAccount()
-    await App.loadContract()
-    await App.render()
+    if(await App.loadWeb3()){
+      await App.loadContract()
+      await App.render()
+    }
   },
 
  loadWeb3: async () => {
@@ -137,29 +137,37 @@ App = {
         window.web3 = new Web3(ethereum); //instanciando a variável web3 da janela
       } else {
         alert('MetaMask found but no Web3 found.');
+        return false
       }
     } else {
       console.log('Non-Ethereum browser detected. You should consider trying MetaMask!')
+      return false
     }
+
     try{
-      await window.ethereum.enable()
-      window.ethereum.on("accountsChanged", App.handleAccountsChanged)
-    } catch (err){
-      console.log(err)
-    }
-  },
+      const accounts = await window.ethereum.request(
+        { 
+          method: 'eth_requestAccounts'
+        }
+      )
 
-
-  loadAccount: async () => {
-
-    const accounts = await window.web3.eth.getAccounts()
-    
-    if(accounts != 0){
       App.account = accounts[0]
-    } else {
-      App.account = "No account address found."
+      if(App.account){
+        window.ethereum.on("accountsChanged", App.handleAccountsChanged)
+        return true
+      } else {
+        return false
+      }
+      
+    } catch (err){
+      if(err.code === 4001){
+        alert("User rejected account connection.")
+      } else {
+        alert("Outro erro...")
+      }
+      console.log(err)
+      return false
     }
-
   },
 
   loadContract: async () => {
@@ -171,8 +179,13 @@ App = {
 
   verifyIsOwner: async () => {
     try{
-      const response = await App.fundMe.methods.owner().call({from: window.userAddress})
-      if(response == App.account){
+      const response = await App.fundMe.methods.owner().call(
+        {
+          from: App.account.toString()
+        }
+      )
+
+      if(response.toString().toUpperCase() == App.account.toString().toUpperCase()){
         return true
       } else {
         return false
@@ -184,10 +197,17 @@ App = {
 
   getEtherPrice: async () => {
     try{
-      const response = await App.fundMe.methods.getPrice().call({from: window.userAddress})
+
+      const response = await App.fundMe.methods.getPrice().call(
+        {
+          from: App.account
+        }
+      )
+
       let priceText = App.formatWeiToFloat(response, 2)
       document.getElementById("ethPrice").innerText = priceText
       return priceText
+
     } catch (err) {
       console.log(err)
     }
@@ -204,15 +224,14 @@ App = {
 
   getContractBalance: async () => {
     try{
-      const response = await window.web3.eth.getBalance(App.contractAddress) 
-      let ethText = App.formatWeiToFloat(response, 5)
-      document.getElementById("ethContractBalance").innerText = ethText
-
+      const response = await window.web3.eth.getBalance(App.contractAddress)
       let _price = await App.getEtherPrice()
+
+      let ethText = App.formatWeiToFloat(response, 5)
       let usdText = parseFloat(_price) * parseFloat(ethText)
-      document.getElementById("usdContractBalance").innerText = App.formatFloat(usdText,2).toString()
-      
-      return (ethText, usdText)
+
+      return [ethText, usdText]
+
     } catch (err) {
       console.log(err)
     }
@@ -351,6 +370,19 @@ App = {
     }
   },
 
+  renderContractBalance: async () => {
+    try{
+
+      [ethText, usdText] = await App.getContractBalance()
+      
+      document.getElementById("ethContractBalance").innerText = ethText
+      document.getElementById("usdContractBalance").innerText = App.formatFloat(usdText,2).toString()
+    
+    } catch (err) {
+      console.log(err)
+    }
+  },
+
   renderLoading: (boolean) => {
     const content = document.getElementById("content")
     const loader = document.getElementById("loader")
@@ -421,7 +453,7 @@ App = {
     try{
 
       if (App.isOwner) {
-        await App.getContractBalance()
+        await App.renderContractBalance()
         owner.classList.remove("hidden")
       } else {
         owner.classList.add("hidden")
